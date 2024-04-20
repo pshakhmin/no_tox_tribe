@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>НТП</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+  <link id="favicon" rel="icon" type="image/x-icon" href="static/icon.png">
+
+</head>
+
+<body class="has-background-light">
+  <style>
+    /* Style for the button */
+    .shine-button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: linear-gradient(45deg, #ffcc00, #ff9900);
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+      /* Add transition effect */
+    }
+
+    /* Animation for the shine effect */
+    .shine-button::before {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(45deg);
+      animation: shine 2s infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+
+      100% {
+        transform: translate(150%, 150%) rotate(45deg);
+      }
+    }
+
+    /* Hover effect */
+    .shine-button:hover {
+      background: linear-gradient(45deg, #ff9900, #ffcc00);
+      /* Change gradient colors on hover */
+    }
+  </style>
+  <section class="hero is-fullheight">
+    <div class="hero-head is-fluid">
+      <nav class="navbar has-background-light" role="navigation" aria-label="main navigation">
+
+        <div class="navbar-brand">
+          <a class="navbar-item" href="../">
+            <img src="static/icon.png">
+            <p class="subtitle is-4">ноу токс племя</p>
+          </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-end">
+            <div class="navbar-start">
+              <a class="navbar-item">
+                Главная
+              </a>
+
+              <a class="navbar-item">
+                Описание
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <p class="title is-1 is-spaced">
+          Выделение тегов и ключевых слов
+        </p>
+        <p class="subtitle is-3">
+          Введите текст для обработки:
+        </p>
+
+
+        <div class="box is-two-thirds is-rounded">
+          <div class="field">
+            <div class="control">
+              <form>
+                <textarea class="textarea" id="textarea" rows="10" placeholder="Введите текст новости"></textarea>
+                <div class="buttons">
+                  <button action="submit" class="shine-button button is-medium mt-2 is-fullwidth">Обработать</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</body>
+
+</html>
