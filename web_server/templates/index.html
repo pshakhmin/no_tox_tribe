@@ -8,15 +8,72 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
   <link id="favicon" rel="icon" type="image/x-icon" href="static/icon.png">
 
+  <script type="text/javascript">
+
+    //function to send a post request to server on button click with textarea content in its body. display animation while awaiting response
+    window.onload = function () {
+      console.log('loaded');
+      document.getElementById('send').addEventListener('click', function () {
+        var textarea = document.getElementById('textarea').value;
+        var xhr = new XMLHttpRequest();
+        var button = document.getElementById('send');
+        var tag_p = document.getElementById('tags');
+        var keywords_p = document.getElementById('keywords');
+        var results_div = document.getElementById('show_results');
+        xhr.open('POST', 'process', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            var tags = response.tags;
+            var keywords = response.keywords;
+            var text = response.text;
+            var tags_html = '';
+            var keywords_html = '';
+            tags.forEach(function (tag) {
+              tags_html += tag + ', ';
+            });
+            keywords.forEach(function (keyword) {
+              keywords_html += "<span class='tag is-rounded subtitle is-6'>" + keyword + "</span>";
+            });
+            tags_html = tags_html.slice(0, -2);
+            tag_p.innerHTML = tags_html;
+            keywords_p.innerHTML = keywords_html;
+            button.classList.remove('shine-button');
+            button.innerHTML = 'Обработать';
+            results_div.style.display = 'block';
+          }
+        };
+        button.classList.add('shine-button');
+        button.innerHTML = 'В процессе...';
+        xhr.send(JSON.stringify({
+          'text': textarea
+        }));
+      });
+    } </script>
 </head>
 
-<body class="has-background-light">
+<body>
   <style>
     /* Style for the button */
+    span {
+      margin-right: 5px;
+    }
+
+    .button {
+      color: white;
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #ffcc00, #ff9900);
+      border: none;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+    }
+
     .shine-button {
       display: inline-block;
       padding: 10px 20px;
-      font-size: 16px;
       background: linear-gradient(45deg, #ffcc00, #ff9900);
       border: none;
       border-radius: 5px;
@@ -38,7 +95,7 @@
       height: 200%;
       background: rgba(255, 255, 255, 0.2);
       transform: rotate(45deg);
-      animation: shine 2s infinite;
+      animation: shine 9s infinite;
     }
 
     @keyframes shine {
@@ -52,14 +109,14 @@
     }
 
     /* Hover effect */
-    .shine-button:hover {
+    .shine-hova:hover {
       background: linear-gradient(45deg, #ff9900, #ffcc00);
       /* Change gradient colors on hover */
     }
   </style>
   <section class="hero is-fullheight">
     <div class="hero-head is-fluid">
-      <nav class="navbar has-background-light" role="navigation" aria-label="main navigation">
+      <nav class="navbar" role="navigation" aria-label="main navigation">
 
         <div class="navbar-brand">
           <a class="navbar-item" href="../">
@@ -101,16 +158,38 @@
               <form>
                 <textarea class="textarea" id="textarea" rows="10" placeholder="Введите текст новости"></textarea>
                 <div class="buttons">
-                  <button action="submit" class="shine-button button is-medium mt-2 is-fullwidth">Обработать</button>
+                  <button type="button" id='send' class="button is-medium mt-2 is-fullwidth">Обработать</button>
                 </div>
-              </form>
+            </div>
+            </form>
+            <br>
+            <div class='box container has-text-centered' id='show_results' style="display: none;">
+              <div class='columns is-mobile is-centered'>
+                <div class='column is-8'>
+                  <div>
+                    <h1 id="tags" class='title'>Tag Elements</h1>
+                    <hr>
+                  </div>
+
+                  <div id="keywords">
+                    <span class="tag">
+                      Tag1
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
+    </div>
+    </div>
     </div>
 
   </section>
 </body>
+
+
 
 </html>
