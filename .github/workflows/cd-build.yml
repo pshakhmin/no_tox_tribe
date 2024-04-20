@@ -60,26 +60,3 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           
-  deploy:
-    name: "Deploy" 
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set the Kubernetes context
-        uses: azure/k8s-set-context@v2
-        with:
-          method: service-account
-          k8s-url: https://83.166.234.244:6443
-          k8s-secret: ${{ secrets.KUBECTL_TOKEN }}
-
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
-      - name: Deploy to the Kubernetes cluster
-        uses: azure/k8s-deploy@v1
-        with:
-          namespace: default
-          manifests: |
-            kubernetes/deployment.yaml
-          images: |
-            ghcr.io/pshakhmin/no_tox_webserver:latest
