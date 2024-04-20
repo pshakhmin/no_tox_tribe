@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: webserver
+  name: webserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webserver
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webserver
+    spec:
+      containers:
+        - image: ghcr.io/pshakhmin/no_tox_webserver:latest
+          name: webserver
+          ports:
+            - containerPort: 80
+          resources: {}
+      imagePullSecrets:
+        - name: regcred
