@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -23,6 +24,23 @@ from aio_pika.abc import (
 HOST = os.environ["RABBITMQ_HOST"]
 USERNAME = os.environ["RABBITMQ_USERNAME"]
 PASSWORD = os.environ["RABBITMQ_PASSWORD"]
+
+
+class TextRequest(BaseModel):
+    text: str
+
+
+class TextResponse(BaseModel):
+    tag: str
+    keywords: list[str] = []
+
+
+class TextRequestBatch(BaseModel):
+    texts: list[str]
+
+
+class TextResponseBatch(BaseModel):
+    response: list[TextResponse]
 
 
 class FibonacciRpcClient:
@@ -56,7 +74,7 @@ class FibonacciRpcClient:
 
         future.set_result(message.body)
 
-    async def call(self, n: int) -> str:
+    async def call(self, n: str):
         correlation_id = str(uuid.uuid4())
 
         loop = asyncio.get_running_loop()
@@ -78,7 +96,7 @@ class FibonacciRpcClient:
         return await future
 
 
-app = FastAPI()
+app = FastAPI(title="no tox tribe", description="API теггирования текстов")
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -89,15 +107,24 @@ async def app_startup():
     fibonacci_rpc = await FibonacciRpcClient().connect()
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", tags=["HTML"], response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 
-@app.post("/process", response_class=HTMLResponse)
-async def process(request: Request):
-    req_body = await request.json()
-    print(req_body)
-    response = await fibonacci_rpc.call(json.dumps(req_body))
-    print(response.decode())
+@app.post("/process", tags=["API"], response_model=TextResponse)
+async def process(request: TextRequest):
+    req_body = request.model_dump_json()
+    response = await fibonacci_rpc.call(req_body)
     return response.decode()
+
+
+@app.post("/processBatch", tags=["API"], response_model=TextResponseBatch)
+async def processBatch(request: TextRequestBatch):
+    responses = []
+    for req in request.dict()["texts"]:
+        mini_req = {"text": req}
+        responses.append(
+            json.loads((await fibonacci_rpc.call(json.dumps(mini_req))).decode())
+        )
+    return TextResponseBatch(response=responses)

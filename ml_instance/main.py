@@ -29,7 +29,7 @@ def on_request(ch, method, props, body):
     n = int(json.loads(body)["text"])
 
     print(f" [.] fib({n})")
-    response = {"tags": [f"fib({n})"], "keywords": [str(fib(n))]}
+    response = {"tag": f"fib({n})", "keywords": [str(fib(n))]}
 
     ch.basic_publish(
         exchange="",
