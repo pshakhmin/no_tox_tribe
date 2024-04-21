@@ -18,8 +18,8 @@ on:
           - debug
 
 jobs:
-  build:
-    name: "Build"
+  build-server:
+    name: "Build server"
     runs-on: 'ubuntu-latest'
     
     steps:
@@ -59,11 +59,53 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
+          
+  build-ml:
+      name: "Build ml"
+      runs-on: 'ubuntu-latest'
+      
+      steps:
+        - name: "Checkout repository"
+          uses: actions/checkout@v3
+  
+        - name: "Login to GitHub Registry"
+          uses: docker/login-action@v1 
+          with:
+            registry: ghcr.io
+            username: "pshakhmin"
+            password: ${{ secrets.REGISTRY_TOKEN }}
+          
+        - name: "Set up Docker Buildx"
+          uses: docker/setup-buildx-action@v1
+  
+        - name: "Cache Docker layers"
+          uses: actions/cache@v2
+          with:
+            path: /tmp/.buildx-cache
+            key: ${{ runner.os }}-buildx-${{ github.sha }}
+            restore-keys: |
+              ${{ runner.os }}-buildx-
+            
+        - name: "Build and push"
+          uses: docker/build-push-action@v2
+          with:
+            context: ml_instance/.
+            push: true
+            tags: |
+              ghcr.io/pshakhmin/no_tox_ml:latest
+            secrets: |
+            cache-from: type=local,src=/tmp/.buildx-cache
+            cache-to: type=local,dest=/tmp/.buildx-cache-new
+            
+        - name: "Move cache"
+          run: |
+            rm -rf /tmp/.buildx-cache
+            mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          
   deploy:
     name: "Deploy"
     runs-on: 'ubuntu-latest'
-    needs: [build]
+    needs: [build-server]
     steps:
       - uses: actions-hub/kubectl@master
         env:
