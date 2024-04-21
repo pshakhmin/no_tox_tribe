@@ -115,8 +115,9 @@ async def root(request: Request):
 @app.post("/process", tags=["API"], response_model=TextResponse)
 async def process(request: TextRequest):
     req_body = request.model_dump_json()
-    response = await fibonacci_rpc.call(req_body)
-    return response.decode()
+    response = json.loads(await fibonacci_rpc.call(req_body))
+    print(response)
+    return TextResponse(**response)
 
 
 @app.post("/processBatch", tags=["API"], response_model=TextResponseBatch)

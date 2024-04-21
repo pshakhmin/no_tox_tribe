@@ -25,18 +25,15 @@
         xhr.onreadystatechange = function () {
           if (xhr.readyState == 4 && xhr.status == 200) {
             var response = JSON.parse(xhr.responseText);
-            var tags = response.tags;
+            var tags = response.tag;
             var keywords = response.keywords;
             var text = response.text;
             var tags_html = '';
             var keywords_html = '';
-            tags.forEach(function (tag) {
-              tags_html += tag + ', ';
-            });
+            tags_html += tags;
             keywords.forEach(function (keyword) {
               keywords_html += "<span class='tag is-rounded subtitle is-6'>" + keyword + "</span>";
             });
-            tags_html = tags_html.slice(0, -2);
             tag_p.innerHTML = tags_html;
             keywords_p.innerHTML = keywords_html;
             button.classList.remove('shine-button');
@@ -132,8 +129,8 @@
                 Главная
               </a>
 
-              <a class="navbar-item">
-                Описание
+              <a class="navbar-item" href="docs">
+                API
               </a>
             </div>
           </div>
