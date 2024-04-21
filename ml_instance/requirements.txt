@@ -1,1 +1,8 @@
 pika
+joblib
+numpy
+hdbscan
+umap-learn
+scikit-learn
+pymorphy2
+yake
